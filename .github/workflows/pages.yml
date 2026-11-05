@@ -18,7 +18,7 @@ on:
       deploy:
         description: Deploy to GitHub Pages after a successful build
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
@@ -80,7 +80,7 @@ jobs:
     if: >-
       github.ref == 'refs/heads/main' && (
         (github.event_name == 'push' && vars.PAGES_DEPLOY_ENABLED == 'true') ||
-        (github.event_name == 'workflow_dispatch' && inputs.deploy)
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy != 'false')
       )
     runs-on: ubuntu-latest
     permissions:
