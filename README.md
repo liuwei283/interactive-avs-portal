@@ -214,7 +214,7 @@ Paper metadata comes from the proposal's reference list. URLs are left blank unl
    git push -u origin main
    ```
    On GitHub Free, Pages requires a **public** repository. That is acceptable here because the repo holds no research content. With GitHub Pro (free via GitHub Education), the repo can be private, but the **Pages site itself is always publicly reachable**. Only the login page is visible without credentials.
-2. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
+2. **Settings → Pages → Build and deployment → Source: Deploy from a branch**, branch **gh-pages**, folder **/ (root)**. The `gh-pages` branch is created by the first deploy run, so run step 5 once first, then select it.
 3. **Settings → Secrets and variables → Actions → Variables:** add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_ADMIN_EMAIL`, and optionally `VITE_SITE_TITLE` and `VITE_MAX_UPLOAD_MB`. Optionally add a **secret** `PROTECTED_PATTERNS` (e.g. team names, project title, partner name) so the build fails if any of them leak into the bundle.
 4. CI (tests, DB tests, build, bundle scan) now runs on every push.
 5. **To deploy:** either set the repository variable `PAGES_DEPLOY_ENABLED` = `true` (deploys every push to `main`), or run the workflow manually (Actions → *CI and GitHub Pages* → Run workflow → deploy ✓).

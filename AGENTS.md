@@ -98,7 +98,7 @@ Before finishing any change: `npm test`, `npm run test:db` (if schema/policies c
 
 ## 6. Deployment
 
-`.github/workflows/pages.yml`: on every push/PR it runs the repo guard (no private files tracked), `npm ci`, `npm test`, DB tests, and `npm run build` with `BASE_PATH=/<repo>/` and `VITE_*` from repository **variables**. It deploys only on `main` when `vars.PAGES_DEPLOY_ENABLED == 'true'` or on a manual run with `deploy = true`. Never enable either without the owner's approval. Never claim a deployment happened until the Actions run is green.
+`.github/workflows/pages.yml`: on every push/PR it runs the repo guard (no private files tracked), `npm ci`, `npm test`, DB tests, and `npm run build` with `BASE_PATH=/<repo>/` and `VITE_*` from repository **variables**. It publishes the built `dist/` to the `gh-pages` branch (Pages source: *Deploy from a branch → gh-pages*), only on `main` when `vars.PAGES_DEPLOY_ENABLED == 'true'` or on a manual run with `deploy = true`. Never enable either without the owner's approval. Never claim a deployment happened until the Actions run is green.
 
 ## 7. Content workflows
 
