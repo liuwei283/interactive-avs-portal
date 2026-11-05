@@ -1,0 +1,51 @@
+{
+  "name": "interactive-avs-research-portal",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/postbuild.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "seed": "node scripts/seed.mjs",
+    "import:files": "node scripts/import-files.mjs",
+    "preview:pages": "node scripts/serve-pages.mjs",
+    "test:db": "bash tests/db/run-db-tests.sh",
+    "upsert": "node scripts/upsert.mjs",
+    "sync:week": "node scripts/sync-week.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
+    "@tanstack/react-query": "^5.106.1",
+    "dompurify": "^3.4.17",
+    "katex": "^0.19.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.1.0",
+    "react-router-dom": "^6.30.6",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "tus-js-client": "^4.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.20",
+    "@tailwindcss/vite": "^4.3.4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.6",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^31.0.0",
+    "pg": "^8.23.1",
+    "tailwindcss": "^4.3.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vitest": "^3.2.7",
+    "yaml": "^2.9.1"
+  }
+}

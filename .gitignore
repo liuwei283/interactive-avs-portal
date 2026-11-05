@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.local
+.env
+.env.*
+!.env.example
+# Protected research material and seed content. NEVER commit.
+private/
+*.pdf
+*.pptx
+.DS_Store
+coverage/

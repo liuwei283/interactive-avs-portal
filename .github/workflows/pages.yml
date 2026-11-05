@@ -1,0 +1,89 @@
+name: CI and GitHub Pages
+
+# CI runs on every push / pull request.
+# DEPLOYMENT IS OPT-IN: the deploy job only runs on `main` when the repository
+# variable PAGES_DEPLOY_ENABLED is set to "true" (Settings → Secrets and
+# variables → Actions → Variables), or when started manually with
+# "Run workflow" and deploy = true.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy to GitHub Pages after a successful build
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refuse protected files in the repository
+        run: |
+          bad=$(git ls-files | grep -Ei '^private/|\.(pdf|pptx|mp4|webm|wav|mp3|flac)$|(^|/)\.env($|\.)' | grep -v '^\.env\.example$' || true)
+          if [ -n "$bad" ]; then echo "Protected or large files are tracked in git:"; echo "$bad"; exit 1; fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit and UI tests
+        run: npm test
+
+      - name: Database authorization tests (local Postgres)
+        run: |
+          PGBIN=$(ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1)
+          export PATH="$PGBIN:$PATH"
+          bash tests/db/run-db-tests.sh
+
+      - name: Build (GitHub Pages subpath)
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_ADMIN_EMAIL: ${{ vars.VITE_ADMIN_EMAIL }}
+          VITE_SITE_TITLE: ${{ vars.VITE_SITE_TITLE }}
+          VITE_MAX_UPLOAD_MB: ${{ vars.VITE_MAX_UPLOAD_MB }}
+          # Optional secret: comma-separated terms that must never appear in the public bundle.
+          PROTECTED_PATTERNS: ${{ secrets.PROTECTED_PATTERNS }}
+        # `npm run build` = typecheck + vite build + 404.html + bundle security scan
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    if: >-
+      github.ref == 'refs/heads/main' && (
+        (github.event_name == 'push' && vars.PAGES_DEPLOY_ENABLED == 'true') ||
+        (github.event_name == 'workflow_dispatch' && inputs.deploy)
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - id: deployment
+        uses: actions/deploy-pages@v4
